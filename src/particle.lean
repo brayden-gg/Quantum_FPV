@@ -39,14 +39,7 @@ lemma mul_ct_def {n : ℕ} (ψ φ : QState 1 n) :
  φ† ⬝ ψ = λ (i : fin n) (k : fin n), (matrix.dot_product (λ (j : fin 1), φ† i j) (λ (j : fin 1), ψ j k)) := 
 by rw [matrix.mul]
 
--- lemma dot_prod_def {n : ℕ} (ψ φ : QState 1 n) : 
---  ∀(i : fin n) (k : fin n), (matrix.dot_product (λ (j : fin 1), φ† i j) (λ (j : fin 1), ψ j k) = (finset.univ.sum (λ (j : fin 1), (φ† i j) * (ψ j k)))) :=
--- begin
---   intros i j,
---   rw [matrix.dot_product],
--- end   
-
-lemma dot_prod_def_fns {n : ℕ} (ψ φ : QState 1 n) : 
+lemma dot_prod_def {n : ℕ} (ψ φ : QState 1 n) : 
  (λ(i : fin n) (k : fin n), (matrix.dot_product (λ (j : fin 1), φ† i j) (λ (j : fin 1), ψ j k))) = (λ(i : fin n) (k : fin n), finset.univ.sum (λ (j : fin 1), (φ† i j) * (ψ j k))) :=
 begin
   funext i j,
@@ -116,27 +109,23 @@ instance inner_product_space {n : ℕ} : inner_product_space.core ℂ (QState 1 
       end,
   nonneg_re := begin
     intro ψ,
-    -- rw [is_R_or_C.re],
     calc (is_R_or_C.re ⟨ψ|ψ⟩)
      = is_R_or_C.re (finset.sum finset.univ (λ (i : fin n), matrix.diag (λ (i k : fin n), finset.sum finset.univ (λ (j : fin 1), ((ψ†) i j) * ψ j k)) i)) :
-     by rw [ip_to_trace, mul_ct_def, dot_prod_def_fns]
-     ... = is_R_or_C.re (finset.sum finset.univ (λ (i : fin n), matrix.diag (λ (i k : fin n), finset.sum finset.univ (λ (j : fin 1), (ψ j i)^* * ψ j k)) i)) :
-     by rw [conj_transpose_def]
-     ... ≥ 0 : by sorry
-    -- rw [ip_to_trace, mul_ct_def, dot_prod_def_fns],
-    -- rw [],
-    -- calc ⇑is_R_or_C.re (finset.sum finset.univ (λ (i : fin n), matrix.diag (λ (i k : fin n), finset.sum finset.univ (λ (j : fin 1), ψ† i j * ψ j k)) i))
-    --  ≤ 0, by sorry
-    -- rw [conj_transpose_def],
+     by rw [ip_to_trace, mul_ct_def, dot_prod_def]
+     ... = finset.sum finset.univ (λ (x : fin n), (ψ 0 x).re * (ψ 0 x).re + (ψ 0 x).im * (ψ 0 x).im) : by simp
+     ... = finset.sum finset.univ (λ (x : fin n), complex.norm_sq (ψ 0 x)) : by simp [complex.norm_sq_apply]
+     ... ≥ finset.sum finset.univ (λ (x : fin n), 0) : by sorry
+     ... = 0 : by simp
   end,
   definite := begin
     intros ψ hzero,
-    
-
-    -- λ (i : fin n) (k : fin n), (finset.univ.sum (λ (j : fin n), (ψ† i k) * (ψ k j)))
-    rw [ip_to_trace, mul_ct_def, dot_prod_def_fns] at hzero,
-    simp at hzero,
-    -- rw [star_ring_end_apply] at *,
+    have hsum : ⟨ψ|ψ⟩ = finset.sum finset.univ (λ (x : fin n), complex.norm_sq (ψ 0 x)), {
+      rw [ip_to_trace, mul_ct_def, dot_prod_def],
+      simp,
+      apply eq.symm,
+      simp [complex.norm_sq_eq_conj_mul_self],
+    },
+    rw [hsum] at hzero,
     sorry
   end}
 
