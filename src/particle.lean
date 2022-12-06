@@ -21,12 +21,14 @@ instance has_smul {m n : ℕ} : has_smul ℂ (QState m n) := matrix.has_smul
 infixl ` ⬝ `:50 := matrix.mul
 postfix `†`:100 := matrix.conj_transpose
 postfix `^*`:100 := star
+def i := complex.I
 
 
 def inner_product {n : ℕ} : QState n 1 → QState 1 n → ℂ :=
  λφ ψ, matrix.trace (φ ⬝ ψ) 
 
 notation `⟨` u `|` v `⟩` := inner_product (u†) v
+notation `|` z `|²`:= complex.norm_sq z
 
 --helpers for inner_product
 lemma ip_to_trace {n : ℕ} (ψ φ : QState 1 n) : 
@@ -59,20 +61,30 @@ begin
   rw [conj_transpose_def],
 end
 
--- lemma conj_tranpose_sum {n : ℕ} (ψ : QState 1 n) : 
---  (λ (i k : fin n), finset.sum finset.univ (λ (j : fin 1), (ψ† i j) * ψ j k)) = (λ (i k : fin n), finset.sum finset.univ (λ (j : fin 1), (ψ j i)^* * ψ j k)) :=
--- begin
---   funext i k,
---   -- rw [finset.val_disj_sum],
---   -- rw [conj_transpose_in_sum],
--- end
+lemma inner_product_apply {n : ℕ} (φ ψ: QState 1 n) :
+ ⟨φ|ψ⟩ = (finset.sum finset.univ (λ (i : fin n), matrix.diag (λ (i k : fin n), finset.sum finset.univ (λ (j : fin 1), ((φ†) i j) * ((ψ) j k))) i)) :=
+begin
+  rw [ip_to_trace, mul_ct_def, dot_prod_def]
+end
 
--- lemma please {n : ℕ} (ψ : QState 1 n) : 
---  (λ (i : fin n), matrix.diag (λ (i k : fin n), finset.sum finset.univ (λ (j : fin 1), (ψ† i j) * ψ j k)) i) = (λ (i : fin n), matrix.diag (λ (i k : fin n), finset.sum finset.univ (λ (j : fin 1), (ψ j i)^* * ψ j k)) i) :=
--- begin
---   funext i,
---   -- rw [conj_transpose_in_sum],
--- end
+lemma le_iff_ge {a b : ℝ} : b ≤ a ↔ a ≥ b:= iff.rfl
+lemma gt_of_ge_and_ne {a b : ℝ} (hne: ¬a = b) (hge : a ≥ b) : a > b := 
+begin
+  exact ne.lt_of_le (ne.symm hne) hge
+end
+
+
+lemma zero_of_sum_eq_zero {n : ℕ} (x : fin n → ℂ) :
+ finset.sum finset.univ (λ(i : fin n), complex.norm_sq (x i) : fin n → ℂ) = 0 → ∀(i : fin n), complex.norm_sq (x i) = 0 := 
+begin
+  intro hzero,
+  intro i,
+  sorry,
+  -- apply (finset.sum_eq_zero_iff_of_nonneg _).mp hzero,
+  -- {simp},
+  -- {intros j j_in_set,
+  -- apply complex.norm_sq_nonneg,}
+end
 
 
 instance inner_product_space {n : ℕ} : inner_product_space.core ℂ (QState 1 n) :=
@@ -88,7 +100,6 @@ instance inner_product_space {n : ℕ} : inner_product_space.core ℂ (QState 1 
      ... = (matrix.trace (φ† ⬝ ψ))^*^* : by rw [matrix.trace_conj_transpose]
      ... = matrix.trace (φ† ⬝ ψ) : by rw [star_star]
      ... = ⟨φ|ψ⟩ : by rw [inner_product],
-    
   end,
   add_left := begin
     intros ψ₁ ψ₂ φ,
@@ -109,53 +120,93 @@ instance inner_product_space {n : ℕ} : inner_product_space.core ℂ (QState 1 
       end,
   nonneg_re := begin
     intro ψ,
+    rw [le_iff_ge],
     calc (is_R_or_C.re ⟨ψ|ψ⟩)
      = is_R_or_C.re (finset.sum finset.univ (λ (i : fin n), matrix.diag (λ (i k : fin n), finset.sum finset.univ (λ (j : fin 1), ((ψ†) i j) * ψ j k)) i)) :
      by rw [ip_to_trace, mul_ct_def, dot_prod_def]
      ... = finset.sum finset.univ (λ (x : fin n), (ψ 0 x).re * (ψ 0 x).re + (ψ 0 x).im * (ψ 0 x).im) : by simp
      ... = finset.sum finset.univ (λ (x : fin n), complex.norm_sq (ψ 0 x)) : by simp [complex.norm_sq_apply]
-     ... ≥ finset.sum finset.univ (λ (x : fin n), 0) : by sorry
-     ... = 0 : by simp
+     ... ≥ 0 : by begin
+      have h_psi_nonneg : ∀ (i : fin n), i ∈ finset.univ → 0 ≤ complex.norm_sq (ψ 0 i), {
+        intros i hi,
+        exact complex.norm_sq_nonneg (ψ 0 i)
+      },
+      exact finset.sum_nonneg h_psi_nonneg,
+     end
   end,
   definite := begin
     intros ψ hzero,
+
     have hsum : ⟨ψ|ψ⟩ = finset.sum finset.univ (λ (x : fin n), complex.norm_sq (ψ 0 x)), {
-      rw [ip_to_trace, mul_ct_def, dot_prod_def],
+      rw [inner_product_apply],
       simp,
       apply eq.symm,
       simp [complex.norm_sq_eq_conj_mul_self],
     },
+    
     rw [hsum] at hzero,
-    sorry
+
+    have h_component_zero: ∀(i : fin n), complex.norm_sq (ψ 0 i) = 0, {
+        apply zero_of_sum_eq_zero (λ(x : fin n), (ψ 0 x)),
+        exact hzero,
+    },
+
+    have all_components_zero: ∀ (i : fin 1) (j : fin n), ψ i j = 0, {
+        intros i j,
+        apply complex.norm_sq_eq_zero.mp,
+        have hi : i = 0, by simp,
+        rw [hi],
+        exact h_component_zero j,
+    },
+    funext i j,
+    exact all_components_zero i j,
   end}
 
-def u : QState 1 2 := ![![1, 0]]
-def d : QState 1 2 := ![![0, 1]]
-noncomputable def r : QState 1 2 := ![![real.sqrt (1/2), real.sqrt (1/2)]]
+def z_plus : QState 1 2 := ![![1, 0]] -- particle in spin up state in the +z direction
+def z_minus : QState 1 2 := ![![0, 1]] -- particle in spin down  state in thr -z direction
+noncomputable def x_plus : QState 1 2 := ![![real.sqrt (1/2), real.sqrt (1/2)]]
+noncomputable def x_minus : QState 1 2 := ![![real.sqrt (1/2), -real.sqrt (1/2)]]
+noncomputable def y_plus : QState 1 2 := ![![real.sqrt (1/2), i*real.sqrt (1/2)]]
+noncomputable def y_minus : QState 1 2 := ![![real.sqrt (1/2), -i*real.sqrt (1/2)]]
 
--- notation |u⟩ := u
--- notation |d⟩ := d
--- notation |r⟩ := r
+-- conventient notation fo
+notation `z₊` := z_plus
+notation `z₋` := z_minus
+notation `x₊` := x_plus
+notation `x₋` := x_minus
+notation `y₊` := y_plus
+notation `y₋` := y_minus
 
--- lemma u_perp_d : ⟨u|d⟩ = 0 :=
--- begin
---   sorry
--- end
+-- probability of finding particle in the +z state in the
+lemma z_plus_prod_z_minus : |⟨z₊|z₋⟩|² = 0 :=
+begin
+  rw [inner_product_apply, z_plus, z_minus],
+  simp,
+end
 
--- lemma u_normed : is_normed u :=
--- begin
---   rw [is_normed, inner_product, bra_of_ket, u],
---   simp,
---   rw conj,
---   simp,
---   rw conj,
---   simp [complex.conj_of_real],
-  
--- end
+lemma z_plus_prod_z_plus : |⟨z₊|z₊⟩|² = 1 :=
+begin
+  rw [inner_product_apply, z_plus],
+  simp,
+end
 
--- lemma mixed_state : ⟨r|u⟩ * ⟨u|r⟩ = 1 / 2 := 
--- begin
-  
--- end
+lemma z_plus_prod_x_plus : |⟨z₊|x₊⟩|² = 1/2 :=
+begin
+  rw [inner_product_apply, z_plus, x_plus],
+  simp,
+end
+
+lemma z_plus_prod_x_minus : |⟨z₊|x₋⟩|² = 1/2 :=
+begin
+  rw [inner_product_apply, z_plus, x_minus],
+  simp,
+end
+
+lemma z_plus_prod_y_plus : |⟨z₊|y₊⟩|² = 1/2 :=
+begin
+  rw [inner_product_apply, z_plus, y_plus],
+  simp,
+end
+
 
 end quantum
