@@ -1,28 +1,6 @@
-import data.complex.basic
-import data.matrix.basic
-import analysis.inner_product_space.basic
-import data.complex.is_R_or_C
-
-/-!
- TODO: explain what the project is!
--/
-
-set_option pp.beta true
-set_option pp.generalized_field_notation false
+import .quantum_state
 
 namespace quantum
-
-@[reducible]
-def QState (m n : ℕ) := matrix (fin m) (fin n) ℂ
-
-instance has_add {m n : ℕ} : has_add (QState m n) := matrix.has_add
-instance has_smul {m n : ℕ} : has_smul ℂ (QState m n) := matrix.has_smul
-
-infixl ` ⬝ `:50 := matrix.mul
-postfix `†`:100 := matrix.conj_transpose
-postfix `^*`:100 := star
-def i := complex.I
-
 
 def inner_product {n : ℕ} : QState n 1 → QState 1 n → ℂ :=
  λφ ψ, matrix.trace (φ ⬝ ψ) 
@@ -162,51 +140,4 @@ instance inner_product_space {n : ℕ} : inner_product_space.core ℂ (QState 1 
     exact all_components_zero i j,
   end}
 
-def z_plus : QState 1 2 := ![![1, 0]] -- particle in spin up state in the +z direction
-def z_minus : QState 1 2 := ![![0, 1]] -- particle in spin down  state in thr -z direction
-noncomputable def x_plus : QState 1 2 := ![![real.sqrt (1/2), real.sqrt (1/2)]]
-noncomputable def x_minus : QState 1 2 := ![![real.sqrt (1/2), -real.sqrt (1/2)]]
-noncomputable def y_plus : QState 1 2 := ![![real.sqrt (1/2), i*real.sqrt (1/2)]]
-noncomputable def y_minus : QState 1 2 := ![![real.sqrt (1/2), -i*real.sqrt (1/2)]]
-
--- conventient notation fo
-notation `z₊` := z_plus
-notation `z₋` := z_minus
-notation `x₊` := x_plus
-notation `x₋` := x_minus
-notation `y₊` := y_plus
-notation `y₋` := y_minus
-
--- probability of finding particle in the +z state in the
-lemma z_plus_prod_z_minus : |⟨z₊|z₋⟩|² = 0 :=
-begin
-  rw [inner_product_apply, z_plus, z_minus],
-  simp,
-end
-
-lemma z_plus_prod_z_plus : |⟨z₊|z₊⟩|² = 1 :=
-begin
-  rw [inner_product_apply, z_plus],
-  simp,
-end
-
-lemma z_plus_prod_x_plus : |⟨z₊|x₊⟩|² = 1/2 :=
-begin
-  rw [inner_product_apply, z_plus, x_plus],
-  simp,
-end
-
-lemma z_plus_prod_x_minus : |⟨z₊|x₋⟩|² = 1/2 :=
-begin
-  rw [inner_product_apply, z_plus, x_minus],
-  simp,
-end
-
-lemma z_plus_prod_y_plus : |⟨z₊|y₊⟩|² = 1/2 :=
-begin
-  rw [inner_product_apply, z_plus, y_plus],
-  simp,
-end
-
-
-end quantum
+  end quantum
