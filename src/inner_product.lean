@@ -5,13 +5,13 @@ namespace quantum
 def inner_product {n : ℕ} : QState 1 n → QState n 1 → ℂ :=
  λφ ψ, matrix.trace (φ ⬝ ψ) 
 
-notation `⟨` u `|` v `⟩` := inner_product (u†) v
+notation `⟪` u `|` v `⟫` := inner_product (u†) v
 notation `|` z `|²`:= complex.norm_sq z
 
 --helpers for inner_product
 lemma ip_to_trace {n : ℕ} (ψ φ : QState n 1) : 
- ⟨φ|ψ⟩ = finset.univ.sum (λ (x : fin 1), (matrix.diag (φ† ⬝ ψ) x)) :=
-calc ⟨φ|ψ⟩
+ ⟪φ|ψ⟫ = finset.univ.sum (λ (x : fin 1), (matrix.diag (φ† ⬝ ψ) x)) :=
+calc ⟪φ|ψ⟫
   = matrix.trace (φ† ⬝ ψ) : by rw [inner_product]
 ... = finset.univ.sum (λ (x : fin 1), (matrix.diag (φ† ⬝ ψ) x)) : by rw [matrix.trace]
 
@@ -39,7 +39,7 @@ begin
 end
 
 lemma inner_product_apply {n : ℕ} (φ ψ: QState n 1) :
- ⟨φ|ψ⟩ = (finset.sum finset.univ (λ (x : fin 1), matrix.diag (λ (i k : fin 1), finset.sum finset.univ (λ (j : fin n), ((φ†) i j) * ((ψ) j k))) x)) :=
+ ⟪φ|ψ⟫ = (finset.sum finset.univ (λ (x : fin 1), matrix.diag (λ (i k : fin 1), finset.sum finset.univ (λ (j : fin n), ((φ†) i j) * ((ψ) j k))) x)) :=
 begin
   rw [ip_to_trace, mul_ct_def, dot_prod_def],
 end
@@ -66,40 +66,40 @@ end
 
 
 instance inner_product_space {n : ℕ} : inner_product_space.core ℂ (QState n 1) :=
- {inner := λφ ψ, ⟨φ|ψ⟩,
+ {inner := λφ ψ, ⟪φ|ψ⟫,
   conj_sym := begin
     intros φ ψ,
     rw [star_ring_end_apply],
-    calc ⟨ψ|φ⟩^*
+    calc ⟪ψ|φ⟫^*
      = (matrix.trace (ψ† ⬝ φ))^* : by rw [inner_product]
      ... = (matrix.trace ((ψ† ⬝ φ)††))^* : by rw [matrix.conj_transpose_conj_transpose]
      ... = (matrix.trace ((φ† ⬝ ψ††)†))^* : by rw [matrix.conj_transpose_mul]
      ... = (matrix.trace ((φ† ⬝ ψ)†))^* : by rw [matrix.conj_transpose_conj_transpose]
      ... = (matrix.trace (φ† ⬝ ψ))^*^* : by rw [matrix.trace_conj_transpose]
      ... = matrix.trace (φ† ⬝ ψ) : by rw [star_star]
-     ... = ⟨φ|ψ⟩ : by rw [inner_product],
+     ... = ⟪φ|ψ⟫ : by rw [inner_product],
   end,
   add_left := begin
     intros ψ₁ ψ₂ φ,
-    calc ⟨(ψ₁ + ψ₂)|φ⟩
+    calc ⟪(ψ₁ + ψ₂)|φ⟫
       = matrix.trace ((ψ₁ + ψ₂)† ⬝ φ) : by rw [inner_product]
       ... = matrix.trace ((ψ₁† + ψ₂†) ⬝ φ) : by rw [matrix.conj_transpose_add]
       ... = matrix.trace ((ψ₁† ⬝ φ) + (ψ₂† ⬝ φ)) : by rw [matrix.add_mul]
       ... = matrix.trace (ψ₁† ⬝ φ) + matrix.trace (ψ₂† ⬝ φ) : by rw [matrix.trace_add]
-      ... = ⟨ψ₁|φ⟩ + ⟨ψ₂|φ⟩ : by rw [inner_product],
+      ... = ⟪ψ₁|φ⟫ + ⟪ψ₂|φ⟫ : by rw [inner_product],
   end,
   smul_left := begin
     intros φ ψ c,
     rw [star_ring_end_apply],
-    calc ⟨c • φ|ψ⟩
+    calc ⟪c • φ|ψ⟫
       = matrix.trace ((c • φ)† ⬝ ψ) : by rw [inner_product]
       ... = (c^*) * (matrix.trace (φ† ⬝ ψ)) : by begin rw [matrix.conj_transpose_smul], simp end
-      ... = (c^*) * ⟨φ|ψ⟩ : by rw [inner_product],
+      ... = (c^*) * ⟪φ|ψ⟫ : by rw [inner_product],
       end,
   nonneg_re := begin
     intro ψ,
     rw [le_iff_ge],
-    calc (is_R_or_C.re ⟨ψ|ψ⟩)
+    calc (is_R_or_C.re ⟪ψ|ψ⟫)
      = is_R_or_C.re (finset.sum finset.univ (λ (x : fin 1), matrix.diag (λ (i k : fin 1), finset.sum finset.univ (λ (j : fin n), ((ψ†) i j) * ψ j k)) x)) :
      by rw [ip_to_trace, mul_ct_def, dot_prod_def]
      ... = finset.sum finset.univ (λ (x : fin n), (ψ x 0).re * (ψ x 0).re + (ψ x 0).im * (ψ x 0).im) : by simp
@@ -115,7 +115,7 @@ instance inner_product_space {n : ℕ} : inner_product_space.core ℂ (QState n 
   definite := begin
     intros ψ hzero,
 
-    have hsum : ⟨ψ|ψ⟩ = finset.sum finset.univ (λ (x : fin n), complex.norm_sq (ψ x 0)), {
+    have hsum : ⟪ψ|ψ⟫ = finset.sum finset.univ (λ (x : fin n), complex.norm_sq (ψ x 0)), {
       rw [inner_product_apply],
       simp,
       apply eq.symm,

@@ -1,5 +1,6 @@
 import .quantum_state
 import data.complex.exponential
+import data.matrix.kronecker
 
 namespace quantum
 
@@ -20,16 +21,16 @@ def σ_z : matrix (fin 2) (fin 2) ℂ :=
    ![0, -1]]
 
 -- corresponds to measurement in z direction
-lemma z_plus_eigenval_σ_z : matrix.mul σ_z z₊ = z₊ :=
+lemma z_plus_eigenval_σ_z : matrix.mul σ_z |z₊⟩ = |z₊⟩ :=
 begin
-  rw [σ_z, z_plus, matrix.mul],
+  rw [σ_z, quantum.z_plus, matrix.mul],
   funext i j,
   simp,
 end
 
-lemma z_minus_eigenval_σ_z : matrix.mul σ_z z₋ = - (z₋) :=
+lemma z_minus_eigenval_σ_z : matrix.mul σ_z |z₋⟩ = -|z₋⟩ :=
 begin
-  rw [σ_z, z_minus, matrix.mul],
+  rw [σ_z, quantum.z_minus, matrix.mul],
   funext i j,
   simp,
 end
