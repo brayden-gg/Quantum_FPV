@@ -1,8 +1,18 @@
 import .quantum_state
 import data.complex.exponential
-import data.matrix.kronecker
 
 namespace quantum
+
+variables {n m p q : ℕ} 
+
+def hermitian (U : matrix (fin n) (fin n) ℂ) : Prop :=
+ U = U†
+
+def unitary (U : matrix (fin n) (fin n) ℂ) : Prop :=
+ U† ⬝ U = 1
+
+def normal (U : matrix (fin n) (fin n) ℂ) : Prop :=
+ (U† ⬝ U) = (U ⬝ U†)
 
 def Id : matrix (fin 2) (fin 2) ℂ :=
   ![![1, 0],

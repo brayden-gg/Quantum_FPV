@@ -2,6 +2,8 @@ import .quantum_state
 
 namespace quantum
 
+variables {n m p q : ℕ} 
+
 def inner_product {n : ℕ} : QState 1 n → QState n 1 → ℂ :=
  λφ ψ, matrix.trace (φ ⬝ ψ) 
 
@@ -140,4 +142,6 @@ instance inner_product_space {n : ℕ} : inner_product_space.core ℂ (QState n 
     exact all_components_zero i j,
   end}
 
-  end quantum
+ 
+
+end quantum
