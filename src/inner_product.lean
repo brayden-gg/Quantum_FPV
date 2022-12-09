@@ -142,6 +142,15 @@ instance inner_product_space {n : ℕ} : inner_product_space.core ℂ (QState n 
     exact all_components_zero i j,
   end}
 
- 
+lemma inner_prod_matrix_ct (ψ φ : QState n 1) (M : matrix (fin n) (fin n) ℂ) :
+ ⟪φ|(M† ⬝ ψ)⟫ = ⟪(M ⬝ φ)|ψ⟫ :=
+calc  ⟪φ|(M† ⬝ ψ)⟫
+ = matrix.trace (φ† ⬝ (M† ⬝ ψ)) : by rw [inner_product] 
+ ... = matrix.trace ((φ† ⬝ M†) ⬝ ψ) : by rw [matrix.mul_assoc]
+ ... = matrix.trace ((φ† ⬝ M†)†† ⬝ ψ) : by rw [matrix.conj_transpose_conj_transpose]
+ ... = matrix.trace ((M†† ⬝ φ††)† ⬝ ψ) : by rw [matrix.conj_transpose_mul]
+ ... = matrix.trace ((M ⬝ φ††)† ⬝ ψ) : by rw [matrix.conj_transpose_conj_transpose]
+ ... = matrix.trace ((M ⬝ φ)† ⬝ ψ) : by rw [matrix.conj_transpose_conj_transpose]
+ ... = ⟪(M ⬝ φ)|ψ⟫ : by rw [inner_product]
 
 end quantum
