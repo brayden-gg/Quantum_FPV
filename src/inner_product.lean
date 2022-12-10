@@ -57,8 +57,9 @@ lemma zero_of_sum_eq_zero {n : ℕ} (x : fin n → ℂ) :
 begin
   intro hzero,
   intro i,
-  have h_re_zero : finset.sum finset.univ (λ(i : fin n), complex.norm_sq (x i)) = 0, {
-    sorry -- this should just be true (??)
+  have h_re_zero : (finset.sum finset.univ (λ(i : fin n), (complex.norm_sq (x i)))) = 0, {
+    norm_cast at hzero,
+    exact hzero,
   },
   apply (finset.sum_eq_zero_iff_of_nonneg _).mp h_re_zero,
   {simp},

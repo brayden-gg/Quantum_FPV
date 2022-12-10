@@ -33,6 +33,7 @@ def tensor_prod (A : matrix (fin m) (fin n) ℂ) (B : matrix (fin p) (fin q) ℂ
 
 infixl ` ⊗ `: 150 := tensor_prod
 
+lemma anon_fin {p} : @fin.mk (2*2) 0 p = (0 : fin 4) := rfl
 -- useful for rewriting the 
 lemma tensor_prod_vec (A B : QState 2 1) : 
   A ⊗ B = !![(A 0 0) * (B 0 0); (A 0 0) * (B 1 0); (A 1 0) * (B 0 0); (A 1 0) * (B 1 0)] :=
@@ -56,8 +57,9 @@ begin
             if_neg (show (3 : fin 4) ≠ 1, from dec_trivial),
             if_neg (show (3 : fin 4) ≠ 2, from dec_trivial)]}
     },
-    rw [vec_to_fn],
-    sorry,
+    -- norm_num ⟨0, _⟩,
+    simp [vec_to_fn],
+    -- rw [anon_fin],
     -- have fin4_has_zero : 0 < 2 * 2, by dec_trivial,
     -- have if_is_true : ite ((⟨0, fin4_has_zero⟩ : fin 4) = (0 : fin 4)) (A 0 0 * B 0 0) (7) = (A 0 0 * B 0 0), by {
     --   rw [if_pos (show (⟨0, fin4_has_zero⟩ : fin 4) = (0 : fin 4), from dec_trivial)],
@@ -68,8 +70,6 @@ begin
     -- have hz : my_zero = (0 : fin 4), from dec_trivial,
     
     -- rw [if_pos hz],
-    -- rw [if_pos (show (⟨0, 
-    -- eq.rec (list.forall_mem_cons.mp (list.fin_range._proof_1 (2 * 2))).left (eq.trans (eq.trans (congr (congr_arg nat.add (eq.trans (eq.trans (congr (congr_arg nat.mul (eq.refl 2)) nat.nat_zero_eq_zero) nat.mul_def) (mul_zero 2))) nat.nat_zero_eq_zero) nat.add_def) (add_zero 0))⟩ : fin 4) = (0 : fin 4), from dec_trivial)],
 
   }
 end
@@ -110,12 +110,19 @@ begin
   ring
 end
 
+-- lemma sum_can_reduce (f : ℕ → ℂ) :
+--  finset.sum finset.univ (λ(i : fin n), f i) = (f n) + finset.sum finset.univ (λ(i : fin (n - 1)), f i) :=
+-- begin
+--   sorry
+-- end
+
 lemma inner_prod_indep_states_eq_prod (u v u' v' : QState 2 1) :
  ⟪(u ⊗ v)|(u' ⊗ v')⟫ = ⟪u|u'⟫ * ⟪v|v'⟫ :=
 begin
   simp [inner_product_apply, tensor_prod_vec],
   rw [distrib_prop],
-  sorry -- sum clearly equals other sum
+  sorry
+  -- rw [sum_can_reduce],
 end
 
 end quantum
