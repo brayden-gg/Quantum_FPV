@@ -25,68 +25,54 @@ lemma fin_mod {a b : ℕ} (i : fin (a * b)) (b_pos : 0 < b): ↑i % b < b := beg
   exact b_pos,
 end
 
+@[reducible]
+def mk_fin_div {m p : ℕ} (i : fin (m*p)) : fin m :=
+  @fin.mk m ((i : ℕ)/p) (fin_div m_pos p_pos i)
+
+@[reducible]
+def mk_fin_mod {m p : ℕ} (i : fin (m*p)) : fin p :=
+  @fin.mk p ((i : ℕ)%p) (fin_mod i p_pos)
 
 def tensor_prod (A : matrix (fin m) (fin n) ℂ) (B : matrix (fin p) (fin q) ℂ) : matrix (fin (m * p)) (fin (n * q)) ℂ :=
- λi j, (A (fin.mk (i / p) (fin_div m_pos p_pos i)) (fin.mk (j / q) (fin_div n_pos q_pos j)))
-  * (B (fin.mk (i % p) (fin_mod i q_pos)) (fin.mk (j % q) (fin_mod j q_pos)))
+ λi j, (A (@mk_fin_div m p i) (@mk_fin_div n q j))
+  * (B (@mk_fin_mod m p i) (@mk_fin_mod n q j))
 
 
 infixl ` ⊗ `: 150 := tensor_prod
 
-lemma anon_fin {p} : @fin.mk (2*2) 0 p = (0 : fin 4) := rfl
+lemma anon_fin2 {p} : (⟨0, p⟩: fin (2*2)) = (0 : fin 4) := rfl
+lemma anon_fin1 {p} : (⟨0, p⟩: fin (1*1)) = (0 : fin 1) := rfl
+lemma anon_fin1_2 {p} : (⟨1, p⟩: fin (2*2)) = (1 : fin 4) := rfl
+lemma anon_fin_helf {p} : (⟨1/2, p⟩: fin 2) = (0 : fin 2) := rfl
+lemma anon_fin_three_halves {p} : (⟨(↑(3 : fin 4) : ℕ)/2, p⟩: fin 2) = (1 : fin 2) := rfl
+lemma anon_fin_one {p} : (⟨((↑(2 : fin (4))) : ℕ)/2, p⟩: fin 2) = (1 : fin 2) := rfl
+lemma anon_fin_two_halves {p} : (⟨(↑(2 : fin 4) : ℕ)/2, p⟩: fin 2) = (1 : fin 2) := rfl
+lemma anon_fin_3_mod_2 {p} : (⟨(↑(3 : fin 4) : ℕ) % 2, p⟩: fin 2) = (1 : fin 2) := rfl
+
+lemma two_times_two_is_four {f : fin 4 → ℂ} :
+ (λ(x : fin (2 * 2)), f x) = (λ(x : fin (4)), f x) := rfl
+
+lemma fn_is_vec (x : ℂ) : 
+  (λ (i : fin 1), x) = matrix.vec_cons x matrix.vec_empty :=
+begin
+  funext i,
+  simp,
+end
+
 -- useful for rewriting the 
 lemma tensor_prod_vec (A B : QState 2 1) : 
   A ⊗ B = !![(A 0 0) * (B 0 0); (A 0 0) * (B 1 0); (A 1 0) * (B 0 0); (A 1 0) * (B 1 0)] :=
 begin
   rw [tensor_prod],
   funext i j,
-  fin_cases *; simp;
-  {have vec_to_fn : matrix.vec_cons (A 0 0 * B 0 0) (matrix.vec_cons 
-                      (A 0 0 * B 1 0) (matrix.vec_cons 
-                        (A 1 0 * B 0 0) (λ (i : fin 1), A 1 0 * B 1 0)))
-    = λi, if i = 0 then (A 0 0 * B 0 0) else 
-                      (if i = 1 then (A 0 0 * B 1 0) else 
-                        (if i = 2 then ( A 1 0 * B 0 0) else 
-                          (A 1 0 * B 1 0))), {
-     funext k,
-     fin_cases k with [0, 1, 2, 3]; simp,
-     {rw [if_neg (show (2 : fin 4) ≠ 0, from dec_trivial), 
-          if_neg (show (2 : fin 4) ≠ 1, from dec_trivial)]},
-     {simp [matrix.vec_head,
-            if_neg (show (3 : fin 4) ≠ 0, from dec_trivial), 
-            if_neg (show (3 : fin 4) ≠ 1, from dec_trivial),
-            if_neg (show (3 : fin 4) ≠ 2, from dec_trivial)]}
-    },
-    -- norm_num ⟨0, _⟩,
-    simp [vec_to_fn],
-    -- rw [anon_fin],
-    -- have fin4_has_zero : 0 < 2 * 2, by dec_trivial,
-    -- have if_is_true : ite ((⟨0, fin4_has_zero⟩ : fin 4) = (0 : fin 4)) (A 0 0 * B 0 0) (7) = (A 0 0 * B 0 0), by {
-    --   rw [if_pos (show (⟨0, fin4_has_zero⟩ : fin 4) = (0 : fin 4), from dec_trivial)],
-    -- },
-    -- rw [fin.constructor],
-    -- rw [if_is_true],
-    -- let my_zero : fin (2 * 2) := ⟨0, eq.rec (list.forall_mem_cons.mp (list.fin_range._proof_1 (2 * 2))).left (eq.trans (eq.trans (congr (congr_arg nat.add (eq.trans (eq.trans (congr (congr_arg nat.mul (eq.refl 2)) nat.nat_zero_eq_zero) nat.mul_def) (mul_zero 2))) nat.nat_zero_eq_zero) nat.add_def) (add_zero 0))⟩,
-    -- have hz : my_zero = (0 : fin 4), from dec_trivial,
-    
-    -- rw [if_pos hz],
-
-  }
+  fin_cases *; simp [anon_fin2]; fin_cases *; simp [anon_fin1, mk_fin_div, mk_fin_mod],
+  {apply or.intro_left,
+   rw [anon_fin_helf]},
+  {rw [fn_is_vec, matrix.cons_append, matrix.empty_append],
+   simp [anon_fin1_2]},
+  {simp [matrix.vec_head, matrix.cons_append],
+   rw [anon_fin_three_halves, anon_fin_3_mod_2]}
 end
-
-lemma tensor_prod_matrix (A B : matrix (fin 2) (fin 2) ℂ) 
- : A ⊗ B = ![![(A 0 0) * (B 0 0), (A 0 0) * (B 0 1), (A 0 1) * (B 0 0), (A 0 1) * (B 0 1)],
-   ![(A 0 0) * (B 1 0), (A 0 0) * (B 1 1), (A 0 1) * (B 1 0), (A 0 1) * (B 1 1)],
-   ![(A 1 0) * (B 0 0), (A 1 0) * (B 0 1), (A 1 1) * (B 0 0), (A 1 1) * (B 0 1)],
-   ![(A 1 0) * (B 1 0), (A 1 0) * (B 1 1), (A 1 1) * (B 1 0), (A 1 1) * (B 1 1)]] :=
-begin
-  simp [tensor_prod],
-  funext i j,
-  fin_cases *; simp;
-  fin_cases *; simp;
-  {sorry} -- use proof from before 
-end
-
 
 def z_plus_z_plus : QState 4 1 := |z₊⟩ ⊗ |z₊⟩
 def z_minus_z_plus : QState 4 1 := |z₋⟩ ⊗ |z₊⟩
@@ -110,19 +96,61 @@ begin
   ring
 end
 
--- lemma sum_can_reduce (f : ℕ → ℂ) :
---  finset.sum finset.univ (λ(i : fin n), f i) = (f n) + finset.sum finset.univ (λ(i : fin (n - 1)), f i) :=
--- begin
---   sorry
--- end
+lemma extract_sum {f : fin 4 → ℂ} :
+ finset.univ.sum (λ(x : fin 4), f x) = f 0 + f 1 + f 2 + f 3 := 
+begin 
+  simp [fin.sum_univ_succ],
+  rw [show fin.succ 2 = (3 : fin 4), by refl],
+  calc f 0 + (f 1 + (f 2 + f 3))
+   = f 0 + ((f 1 + f 2) + f 3) : by rw [add_assoc]
+   ... = (f 0 + (f 1 + f 2)) + f 3 : by rw [add_assoc (f 0) (f 1 + f 2) (f 3)]
+   ... = f 0 + f 1 + f 2 + f 3 : by rw [add_assoc (f 0) (f 1) (f 2)],
+end
 
 lemma inner_prod_indep_states_eq_prod (u v u' v' : QState 2 1) :
  ⟪(u ⊗ v)|(u' ⊗ v')⟫ = ⟪u|u'⟫ * ⟪v|v'⟫ :=
 begin
   simp [inner_product_apply, tensor_prod_vec],
   rw [distrib_prop],
-  sorry
-  -- rw [sum_can_reduce],
+  rw [two_times_two_is_four],
+  rw [extract_sum],
+  rw [show (2 : fin 4) = @fin.succ 4 1, by refl],
+  rw [show (↑(fin.succ (1 : fin 4)) : fin 4) = ((fin.succ (1 : fin 4)) : fin 4), by refl],
+  rw [matrix.cons_val_zero, matrix.cons_val_zero, matrix.cons_val_one, matrix.cons_val_one],
+  rw [matrix.cons_val_succ, matrix.vec_head, matrix.vec_head, matrix.cons_val_zero, matrix.cons_val_zero],
+  rw [show (↑(1 : fin 4) : fin 3) = (1 : fin 3), by refl],
+  rw [matrix.cons_val_one, matrix.cons_val_succ, matrix.cons_val_one],
+  rw [show (3 : fin 4) = @fin.succ 4 (@fin.succ 4 1), by refl],
+  rw [show (↑(fin.succ (↑(fin.succ (1 : fin 4)) : fin 4)) : fin 4) = ((fin.succ (fin.succ (1 : fin 4))) : fin 4), by refl],
+  rw [matrix.vec_head, matrix.vec_head, matrix.cons_val_succ, matrix.cons_val_succ, matrix.cons_val_succ, matrix.cons_val_succ, matrix.cons_val_zero, matrix.cons_val_zero],
+  rw [show (↑(1 : fin 4) : fin 2) = (1 : fin 2), by refl],
+  rw [matrix.cons_val_one, matrix.cons_val_one, matrix.vec_head, matrix.vec_head],
+  calc  (u 0 0 * v 0 0)^* * (u' 0 0 * v' 0 0) + 
+        (u 0 0 * v 1 0)^* * (u' 0 0 * v' 1 0) + 
+        (u 1 0 * v 0 0)^* * (u' 1 0 * v' 0 0) + 
+        (u 1 0 * v 1 0)^* * (u' 1 0 * v' 1 0) 
+     =  ((u 0 0)^* * (v 0 0)^*) * (u' 0 0 * v' 0 0) + 
+        (u 0 0 * v 1 0)^* * (u' 0 0 * v' 1 0) + 
+        (u 1 0 * v 0 0)^* * (u' 1 0 * v' 0 0) + 
+        (u 1 0 * v 1 0)^* * (u' 1 0 * v' 1 0) : by rw [star_mul']
+  ... = ((u 0 0)^* * (v 0 0)^*) * (u' 0 0 * v' 0 0) + 
+        ((u 0 0)^* * (v 1 0)^*) * (u' 0 0 * v' 1 0) + 
+        (u 1 0 * v 0 0)^* * (u' 1 0 * v' 0 0) + 
+        (u 1 0 * v 1 0)^* * (u' 1 0 * v' 1 0) : by rw [star_mul']
+  ... = ((u 0 0)^* * (v 0 0)^*) * (u' 0 0 * v' 0 0) + 
+        ((u 0 0)^* * (v 1 0)^*) * (u' 0 0 * v' 1 0) + 
+        ((u 1 0)^* * (v 0 0)^*) * (u' 1 0 * v' 0 0) + 
+        (u 1 0 * v 1 0)^* * (u' 1 0 * v' 1 0) : by rw [star_mul']
+  ... = ((u 0 0)^* * (v 0 0)^*) * (u' 0 0 * v' 0 0) + 
+        ((u 0 0)^* * (v 1 0)^*) * (u' 0 0 * v' 1 0) + 
+        ((u 1 0)^* * (v 0 0)^*) * (u' 1 0 * v' 0 0) + 
+        ((u 1 0)^* * (v 1 0)^*) * (u' 1 0 * v' 1 0) : by rw [star_mul']
+  ... = (u 0 0)^* * u' 0 0 * ((v 0 0)^* * v' 0 0) + 
+        (u 0 0)^* * u' 0 0 * ((v 1 0)^* * v' 1 0) + 
+        (u 1 0)^* * u' 1 0 * ((v 0 0)^* * v' 0 0) + 
+        (u 1 0)^* * u' 1 0 * ((v 1 0)^* * v' 1 0) : by ring,
 end
+
+
 
 end quantum
