@@ -12,9 +12,12 @@ variables {n m p q : ℕ}
  No unitary operator can exist that transforms any given quantum state
  into a copy of another quantum state
 
- - "Raw materials", |r⟩ : an arbetrary quantum state to be transformed by U.
+ - "Raw materials", |r⟩ : an arbitrary quantum state to be transformed by U.
  Since the specific value of r is nor important, we simply set it to the |z₊⟩ state
  - "Charlie", |c⟩ : a  quantum state to be cloned 
+
+ This proof is specifically for spin-1/2 particles (2D vectors) but is true in general
+ and could be extened to any n if lean's sum library was more cooperative.
 -/
 
 theorem no_cloning : 

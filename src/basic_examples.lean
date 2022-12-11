@@ -1,4 +1,5 @@
 import .quantum_state
+import .paired_states
 import .inner_product
 
 namespace quantum
@@ -43,6 +44,13 @@ end
 lemma z_plus_prod_y_plus : |⟪z₊|y₊⟫|² = 1/2 :=
 begin
   rw [inner_product_apply, z_plus, y_plus],
+  simp,
+end
+
+-- simple example of a state representing a pair of particles
+lemma z_plus_z_plus_is_basis : |z₊z₊⟩ = !![1; 0; 0; 0] :=
+begin
+  rw [z_plus_z_plus, tensor_prod_vec, z_plus],
   simp,
 end
 
