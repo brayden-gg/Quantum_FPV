@@ -1,5 +1,4 @@
 import .quantum_state
-import .inner_product
 import .helper_lemmas
 
 namespace quantum
@@ -53,39 +52,5 @@ notation `|z₊z₊⟩` := z_plus_z_plus
 notation `|z₋z₊⟩` := z_minus_z_plus
 notation `|z₊z₋⟩` := z_plus_z_minus
 notation `|z₋z₋⟩` := z_minus_z_minus
-
-lemma inner_prod_indep_states_eq_prod (u v u' v' : QState 2 1) :
- ⟪(u ⊗ v)|(u' ⊗ v')⟫ = ⟪u|u'⟫ * ⟪v|v'⟫ :=
-begin
-  simp [inner_product_apply, tensor_prod_vec],
-  rw [distrib_prop],
-  rw [two_times_two_is_four],
-  rw [extract_sum],
-  rw [show (2 : fin 4) = @fin.succ 4 1, by refl],
-  rw [show (↑(fin.succ (1 : fin 4)) : fin 4) = ((fin.succ (1 : fin 4)) : fin 4), by refl],
-  rw [matrix.cons_val_zero, matrix.cons_val_zero, matrix.cons_val_one, matrix.cons_val_one],
-  rw [matrix.cons_val_succ, matrix.vec_head, matrix.vec_head, matrix.cons_val_zero, matrix.cons_val_zero],
-  rw [show (↑(1 : fin 4) : fin 3) = (1 : fin 3), by refl],
-  rw [matrix.cons_val_one, matrix.cons_val_succ, matrix.cons_val_one],
-  rw [show (3 : fin 4) = @fin.succ 4 (@fin.succ 4 1), by refl],
-  rw [show (↑(fin.succ (↑(fin.succ (1 : fin 4)) : fin 4)) : fin 4) = ((fin.succ (fin.succ (1 : fin 4))) : fin 4), by refl],
-  rw [matrix.vec_head, matrix.vec_head, matrix.cons_val_succ, matrix.cons_val_succ, matrix.cons_val_succ, matrix.cons_val_succ, matrix.cons_val_zero, matrix.cons_val_zero],
-  rw [show (↑(1 : fin 4) : fin 2) = (1 : fin 2), by refl],
-  rw [matrix.cons_val_one, matrix.cons_val_one, matrix.vec_head, matrix.vec_head],
-  calc  (u 0 0 * v 0 0)^* * (u' 0 0 * v' 0 0) + 
-        (u 0 0 * v 1 0)^* * (u' 0 0 * v' 1 0) + 
-        (u 1 0 * v 0 0)^* * (u' 1 0 * v' 0 0) + 
-        (u 1 0 * v 1 0)^* * (u' 1 0 * v' 1 0) 
-   = ((u 0 0)^* * (v 0 0)^*) * (u' 0 0 * v' 0 0) + 
-        ((u 0 0)^* * (v 1 0)^*) * (u' 0 0 * v' 1 0) + 
-        ((u 1 0)^* * (v 0 0)^*) * (u' 1 0 * v' 0 0) + 
-        ((u 1 0)^* * (v 1 0)^*) * (u' 1 0 * v' 1 0) : by rw [star_mul', star_mul', star_mul', star_mul']
-  ... = (u 0 0)^* * u' 0 0 * ((v 0 0)^* * v' 0 0) + 
-        (u 0 0)^* * u' 0 0 * ((v 1 0)^* * v' 1 0) + 
-        (u 1 0)^* * u' 1 0 * ((v 0 0)^* * v' 0 0) + 
-        (u 1 0)^* * u' 1 0 * ((v 1 0)^* * v' 1 0) : by ring,
-end
-
-
 
 end quantum

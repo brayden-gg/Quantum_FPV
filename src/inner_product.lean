@@ -1,4 +1,5 @@
 import .quantum_state
+import .paired_states
 
 namespace quantum
 
@@ -153,5 +154,86 @@ calc  ⟪φ|(M† ⬝ ψ)⟫
  ... = matrix.trace ((M ⬝ φ††)† ⬝ ψ) : by rw [matrix.conj_transpose_conj_transpose]
  ... = matrix.trace ((M ⬝ φ)† ⬝ ψ) : by rw [matrix.conj_transpose_conj_transpose]
  ... = ⟪(M ⬝ φ)|ψ⟫ : by rw [inner_product]
+
+lemma inner_prod_indep_states_eq_prod (u v u' v' : QState 2 1) :
+ ⟪(u ⊗ v)|(u' ⊗ v')⟫ = ⟪u|u'⟫ * ⟪v|v'⟫ :=
+begin
+  simp [inner_product_apply, tensor_prod_vec],
+  rw [distrib_prop],
+  rw [two_times_two_is_four],
+  rw [extract_sum],
+  rw [show (2 : fin 4) = @fin.succ 4 1, by refl],
+  rw [show (↑(fin.succ (1 : fin 4)) : fin 4) = ((fin.succ (1 : fin 4)) : fin 4), by refl],
+  rw [matrix.cons_val_zero, matrix.cons_val_zero, matrix.cons_val_one, matrix.cons_val_one],
+  rw [matrix.cons_val_succ, matrix.vec_head, matrix.vec_head, matrix.cons_val_zero, matrix.cons_val_zero],
+  rw [show (↑(1 : fin 4) : fin 3) = (1 : fin 3), by refl],
+  rw [matrix.cons_val_one, matrix.cons_val_succ, matrix.cons_val_one],
+  rw [show (3 : fin 4) = @fin.succ 4 (@fin.succ 4 1), by refl],
+  rw [show (↑(fin.succ (↑(fin.succ (1 : fin 4)) : fin 4)) : fin 4) = ((fin.succ (fin.succ (1 : fin 4))) : fin 4), by refl],
+  rw [matrix.vec_head, matrix.vec_head, matrix.cons_val_succ, matrix.cons_val_succ, matrix.cons_val_succ, matrix.cons_val_succ, matrix.cons_val_zero, matrix.cons_val_zero],
+  rw [show (↑(1 : fin 4) : fin 2) = (1 : fin 2), by refl],
+  rw [matrix.cons_val_one, matrix.cons_val_one, matrix.vec_head, matrix.vec_head],
+  calc  (u 0 0 * v 0 0)^* * (u' 0 0 * v' 0 0) + 
+        (u 0 0 * v 1 0)^* * (u' 0 0 * v' 1 0) + 
+        (u 1 0 * v 0 0)^* * (u' 1 0 * v' 0 0) + 
+        (u 1 0 * v 1 0)^* * (u' 1 0 * v' 1 0) 
+   = ((u 0 0)^* * (v 0 0)^*) * (u' 0 0 * v' 0 0) + 
+        ((u 0 0)^* * (v 1 0)^*) * (u' 0 0 * v' 1 0) + 
+        ((u 1 0)^* * (v 0 0)^*) * (u' 1 0 * v' 0 0) + 
+        ((u 1 0)^* * (v 1 0)^*) * (u' 1 0 * v' 1 0) : by rw [star_mul', star_mul', star_mul', star_mul']
+  ... = (u 0 0)^* * u' 0 0 * ((v 0 0)^* * v' 0 0) + 
+        (u 0 0)^* * u' 0 0 * ((v 1 0)^* * v' 1 0) + 
+        (u 1 0)^* * u' 1 0 * ((v 0 0)^* * v' 0 0) + 
+        (u 1 0)^* * u' 1 0 * ((v 1 0)^* * v' 1 0) : by ring,
+end
+ -- probability of finding particle in the +z state in the -z state
+-- (they are orthogonal so will be zero)
+lemma z_plus_prod_z_minus : |⟪z₊|z₋⟫|² = 0 :=
+begin
+  rw [inner_product_apply, z_plus, z_minus],
+  simp,
+end
+
+-- probability of finding particle in the +z state in the +z state
+-- (they are equal and normlized so will be one)
+lemma z_plus_prod_z_plus : |⟪z₊|z₊⟫|² = 1 :=
+begin
+  rw [inner_product_apply, z_plus],
+  simp,
+end
+
+lemma z_plus_prod_z_plus' : ⟪z₊|z₊⟫ = 1 :=
+begin
+  rw [inner_product_apply, z_plus],
+  simp,
+end
+
+-- probability of finding particle in the +z state in the +x state
+lemma z_plus_prod_x_plus : |⟪z₊|x₊⟫|² = 1/2 :=
+begin
+  rw [inner_product_apply, z_plus, x_plus],
+  simp,
+end
+
+-- probability of finding particle in the +z state in the -x state
+lemma z_plus_prod_x_minus : |⟪z₊|x₋⟫|² = 1/2 :=
+begin
+  rw [inner_product_apply, z_plus, x_minus],
+  simp,
+end
+
+-- probability of finding particle in the +z state in the +y state
+lemma z_plus_prod_y_plus : |⟪z₊|y₊⟫|² = 1/2 :=
+begin
+  rw [inner_product_apply, z_plus, y_plus],
+  simp,
+end
+
+-- simple example of a state representing a pair of particles
+lemma z_plus_z_plus_is_basis : |z₊z₊⟩ = !![1; 0; 0; 0] :=
+begin
+  rw [z_plus_z_plus, tensor_prod_vec, z_plus],
+  simp,
+end
 
 end quantum

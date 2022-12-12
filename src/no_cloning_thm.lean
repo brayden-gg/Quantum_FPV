@@ -2,7 +2,6 @@ import .quantum_state
 import .inner_product
 import .operators
 import .paired_states
-import .basic_examples
 
 namespace quantum
 

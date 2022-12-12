@@ -1,5 +1,4 @@
 import .quantum_state
-import .inner_product
 
 namespace quantum
 
