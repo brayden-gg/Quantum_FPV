@@ -7,9 +7,9 @@ namespace quantum
 variables {n m p q : ℕ} 
 
 /-
-  The tensor product of multiple particles contains all the information 
+  The tensor product of multiple particles' states contains all the information 
   about the particles. The particles are said to be be independent when 
-  the state is factorable into a tensor prouct of the particles and said
+  the state is factorable into a tensor prouct of the two states and said
   to be entangled when it is not.
 -/
 
@@ -35,13 +35,13 @@ lemma tensor_prod_vec (A B : QState 2 1) :
 begin
   rw [tensor_prod],
   funext i j,
-  fin_cases *; simp [anon_fin2]; fin_cases *; simp [anon_fin1, mk_fin_div, mk_fin_mod],
+  fin_cases *; simp [anon_0_fin4]; fin_cases *; simp [anon_0_fin1, mk_fin_div, mk_fin_mod],
   {apply or.intro_left,
-   rw [anon_fin_helf]},
+   rw [anon_half_fin2]},
   {rw [fn_is_vec, matrix.cons_append, matrix.empty_append],
-   simp [anon_fin1_2]},
+   simp [anon_1_fin4]},
   {simp [matrix.vec_head, matrix.cons_append],
-   rw [anon_fin_three_halves, anon_fin_3_mod_2]}
+   rw [anon_three_halves_fin2, anon_3_mod_2_fin2]}
 end
 
 def z_plus_z_plus : QState 4 1 := |z₊⟩ ⊗ |z₊⟩

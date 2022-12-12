@@ -4,14 +4,12 @@ import .inner_product
 namespace quantum
 
 -- for when lean gets confused about ⟨0, _⟩ = 0 etc.
-lemma anon_fin2 {p} : (⟨0, p⟩: fin (2*2)) = (0 : fin 4) := rfl
-lemma anon_fin1 {p} : (⟨0, p⟩: fin (1*1)) = (0 : fin 1) := rfl
-lemma anon_fin1_2 {p} : (⟨1, p⟩: fin (2*2)) = (1 : fin 4) := rfl
-lemma anon_fin_helf {p} : (⟨1/2, p⟩: fin 2) = (0 : fin 2) := rfl
-lemma anon_fin_three_halves {p} : (⟨(↑(3 : fin 4) : ℕ)/2, p⟩: fin 2) = (1 : fin 2) := rfl
-lemma anon_fin_one {p} : (⟨((↑(2 : fin (4))) : ℕ)/2, p⟩: fin 2) = (1 : fin 2) := rfl
-lemma anon_fin_two_halves {p} : (⟨(↑(2 : fin 4) : ℕ)/2, p⟩: fin 2) = (1 : fin 2) := rfl
-lemma anon_fin_3_mod_2 {p} : (⟨(↑(3 : fin 4) : ℕ) % 2, p⟩: fin 2) = (1 : fin 2) := rfl
+lemma anon_0_fin4 {p} : (⟨0, p⟩: fin (2*2)) = (0 : fin 4) := rfl
+lemma anon_0_fin1 {p} : (⟨0, p⟩: fin (1*1)) = (0 : fin 1) := rfl
+lemma anon_1_fin4 {p} : (⟨1, p⟩: fin (2*2)) = (1 : fin 4) := rfl
+lemma anon_half_fin2 {p} : (⟨1/2, p⟩: fin 2) = (0 : fin 2) := rfl
+lemma anon_three_halves_fin2 {p} : (⟨(↑(3 : fin 4) : ℕ)/2, p⟩: fin 2) = (1 : fin 2) := rfl
+lemma anon_3_mod_2_fin2 {p} : (⟨(↑(3 : fin 4) : ℕ) % 2, p⟩: fin 2) = (1 : fin 2) := rfl
 
 -- showing that fin supports division for tensor product def'n
 lemma fin_div {a b : ℕ} (a_pos : 0 < a) (b_pos : 0 < b) (i : fin (a * b)) : ↑i / b < a :=
