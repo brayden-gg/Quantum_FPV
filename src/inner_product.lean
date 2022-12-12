@@ -3,6 +3,12 @@ import .paired_states
 
 namespace quantum
 
+/-
+  Defines an quantum states as an instance of an inner product space as
+  well as some useful lemmas for combining inner products with operators,
+  tensor products etc.
+-/
+
 variables {n m p q : ℕ} 
 
 def inner_product {n : ℕ} : QState 1 n → QState n 1 → ℂ :=

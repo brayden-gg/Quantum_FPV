@@ -3,9 +3,6 @@ import data.matrix.basic
 import analysis.inner_product_space.basic
 import data.complex.is_R_or_C
 
-/-!
- Definition of quantum state and relevant 
--/
 
 set_option pp.beta true
 set_option pp.generalized_field_notation false
