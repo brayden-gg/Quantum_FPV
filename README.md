@@ -2,14 +2,12 @@
 
 A simple library for proofs about quantum mechanics in Lean. Made as a final project for CSCI1951x: Formal Proof and Verification.
 
-The goal of this project was to create a representation of particles,
-as well as various lemmas and functions to make the library useful for calculations and proofs about quantum states in lean.
+### Main tasks of this project
 
-### Design Choices
-
--   I represent particles as column vectors (for bras) and row vectors (for kets) using mathlib's matrix library.
--   I defined an inner product on quantum states so that the lemmas related to inner products can be used for proofs.
--   I also defined a tensor product between quantum states (and operators on the states) to represent pairs of particles
+-   Represent particles/states conveniently as a complex vector space
+-   Define an inner product on quantum states so that the lemmas related to inner products can be used for proofs.
+-   Define a tensor product between quantum states (and operators on the states) to represent pairs of particles
+-   Proof of the no-cloning theorem
 
 ### No-Cloning Theorem
 
