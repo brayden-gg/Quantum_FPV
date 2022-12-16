@@ -11,4 +11,4 @@ A simple library for proofs about quantum mechanics in Lean. Made as a final pro
 
 ### No-Cloning Theorem
 
-I proved the no-cloning theorem using a proof we covered in APMA1931W: Probabilities in Quantum Mechanics. The theorem states that no unitary operator (the ones used to represent the passage of time in quantum mechanics) can turn an arbitrary quantum state into a copy of the desired state. This is done using properties of unitary operators to show that the two states must be related somehow, which violates our assumption that the two states are independent.
+I proved the no-cloning theorem using a proof based on what we covered in APMA1931W: Probabilities in Quantum Mechanics. The theorem states that no unitary operator (the ones used to represent the passage of time in quantum mechanics) can turn an arbitrary quantum state into a copy of the desired state. This is done using properties of unitary operators to show that the two states must be related somehow, which violates our assumption that the two states are independent.
