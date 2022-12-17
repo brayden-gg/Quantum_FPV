@@ -11,10 +11,10 @@ namespace quantum
 
 variables {n m p q : ℕ} 
 
-def inner_product {n : ℕ} : QState 1 n → QState n 1 → ℂ :=
- λφ ψ, matrix.trace (φ ⬝ ψ) 
+def inner_product {n : ℕ} : QState n 1 → QState n 1 → ℂ :=
+ λφ ψ, matrix.trace ((φ†) ⬝ ψ) 
 
-notation `⟪` u `|` v `⟫` := inner_product (u†) v
+notation `⟪` u `|` v `⟫` := inner_product u v
 notation `|` z `|²`:= complex.norm_sq z
 
 --helpers for inner_product
